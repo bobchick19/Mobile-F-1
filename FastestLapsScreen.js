@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
 
-const FastestLapsScreen = ({ route }) => {
-  const { raceId } = route.params; 
+const FastestLapsScreen = () => {
+  const raceId = useSelector(state => state.raceId);
   const [fastestLaps, setFastestLaps] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchFastestLapsData();
-  }, [raceId]); 
+  }, [raceId]);
 
   const fetchFastestLapsData = async () => {
     try {
-      const response = await fetch(`https://v1.formula-1.api-sports.io/rankings/fastestlaps?race=${raceId}`, {
+      const response = await fetch(`https://v1.formula-1.api-sports.io/fastest-laps?race=${raceId}`, {
         method: "GET",
         headers: {
           "x-rapidapi-host": "v1.formula-1.api-sports.io",
@@ -21,12 +22,11 @@ const FastestLapsScreen = ({ route }) => {
       });
 
       const data = await response.json();
-      console.log(data)
       if (data && data.response) {
         setFastestLaps(data.response);
         setLoading(false);
       } else {
-        console.error('Ошибка при получении данных о быстрых кругах');
+        console.error('Ошибка при получении данных о самых быстрых кругах');
       }
     } catch (error) {
       console.error('Ошибка при получении данных:', error);
@@ -34,30 +34,37 @@ const FastestLapsScreen = ({ route }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Самые быстрые круги:</Text>
-      {loading ? (
-        <ActivityIndicator size="large" color="#007BFF" />
-      ) : (
-        fastestLaps.map((lap, index) => (
-          <View key={index} style={styles.fastestLap}>
-            <Image source={{ uri: lap.driver.image }} style={styles.image} />
-            <Text>{`${lap.driver.name} (${lap.driver.abbr})`}</Text>
-            <Text>{`Команда: ${lap.team.name}`}</Text>
-            <Text>{`Позиция: ${lap.position}`}</Text>
-            <Text>{`Круг: ${lap.lap}`}</Text>
-            <Text>{`Время: ${lap.time}`}</Text>
-            <Text>{`Средняя скорость: ${lap.avg_speed} км/ч`}</Text>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#007BFF" />
+        ) : (
+          <View>
+            <Text style={styles.title}>Самые быстрые круги:</Text>
+            {fastestLaps.map((lap, index) => (
+              <View key={index} style={styles.lapEntry}>
+                <Text>{`Водитель: ${lap.driver.name}`}</Text>
+                <Text>{`Команда: ${lap.team.name}`}</Text>
+                <Text>{`Время: ${lap.time}`}</Text>
+              </View>
+            ))}
           </View>
-        ))
-      )}
+        )}
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  scrollContainer: {
     flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fffdea',
+    paddingHorizontal: 20,
+  },
+  container: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fffdea',
@@ -69,20 +76,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#462e2e',
   },
-  fastestLap: {
+  lapEntry: {
     backgroundColor: '#ffe5c8',
     borderWidth: 1,
     borderColor: '#462e2e',
     padding: 10,
     borderRadius: 5,
     marginBottom: 20,
-    alignItems: 'center',
-  },
-  image: {
-    width: 100,
-    height: 100,
-    resizeMode: 'cover',
-    marginBottom: 10,
   },
 });
 

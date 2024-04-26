@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ActivityIndicator, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
 
-const StartingGridScreen = ({ route }) => {
-  const navigation = useNavigation();
-  const { raceId } = route.params;
+const StartingGridScreen = () => {
+  const raceId = useSelector(state => state.raceId);
   const [startingGrid, setStartingGrid] = useState([]);
   const [loading, setLoading] = useState(true);
 

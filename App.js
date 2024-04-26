@@ -1,6 +1,8 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { Provider } from 'react-redux';
+import store from './store';
 import LoginScreen from './LoginScreen';
 import SeasonsScreen from './SeasonsScreen';
 import CitiesScreen from './CitiesScreen';
@@ -31,6 +33,7 @@ const Stack = createStackNavigator();
 
 const App = () => {
   return (
+    <Provider store={store}>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Авторизация' }} />
@@ -50,6 +53,7 @@ const App = () => {
         <Stack.Screen name="StartingGrid" component={StartingGridScreen} options={{ title: 'Выберите гонку' }} />
       </Stack.Navigator>
     </NavigationContainer>
+    </Provider>
   );
 };
 
